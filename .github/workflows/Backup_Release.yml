@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: 'Get Release title'
         id: get_name
         uses: actions/github-script@v6
@@ -23,14 +23,17 @@ jobs:
             })
             core.setOutput('name', String(res.data.name))
             core.setOutput('tag_name', String(res.data.name).replace(' ','-'))
+
       - name: download
-        uses: robinraju/release-downloader@v1.6
+        # robinraju/release-downloader@v1.8
+        uses: robinraju/release-downloader@efa4cd07bd0195e6cc65e9e30c251b49ce4d3e51
         with: 
           repository: "Dreamacro/clash"
           tag: "premium"
           tarBall: false
           zipBall: false
           out-file-path: "release"
+
       - name: Commit version
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -44,9 +47,10 @@ jobs:
           git add release_version
           git diff-index --quiet HEAD || ( git commit -m "${{ steps.get_name.outputs.name }}" && git push origin version )
           git checkout main
-          
+
       - name: Create release
-        uses: ncipollo/release-action@v1
+        # ncipollo / release-action v1.13.0
+        uses: ncipollo/release-action@6c75be85e571768fa31b40abf38de58ba0397db5
         with:
           artifacts: "release/*"
           commit: version
